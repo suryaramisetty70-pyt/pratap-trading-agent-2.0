@@ -1,0 +1,59 @@
+{
+  "runs": [
+    {
+      "timestamp": "2026-09-26T12:36:51Z",
+      "version_evaluated": "v_20260926_180651",
+      "passed_gate": false,
+      "reason": "Fold consistency failure: Minimum fold hit rate (40.6%) below 48.0% tolerance threshold.",
+      "candidate_metrics": {
+        "hit_rate": 0.4522,
+        "sortino_ratio": -1.56,
+        "rmse": 1.492877,
+        "max_drawdown": 5.7478,
+        "fold_count": 5,
+        "fold_hit_rates": [
+          0.45,
+          0.4833,
+          0.4667,
+          0.4056,
+          0.4556
+        ]
+      },
+      "baseline_metrics": {
+        "hit_rate": 0.582,
+        "sortino_ratio": 1.42,
+        "rmse": 0.0142,
+        "max_drawdown": 0.085,
+        "num_folds": 5,
+        "purged_cv_score": 0.582
+      },
+      "elapsed_seconds": 67.26,
+      "tickers_used": [
+        "RELIANCE",
+        "TCS"
+      ]
+    }
+  ],
+  "promotions": [
+    {
+      "timestamp": "2026-09-26T12:39:17Z",
+      "promoted_version": "v_1.1.0-champion",
+      "previous_version": "v1.0.0-baseline",
+      "metrics": {
+        "hit_rate": 0.598,
+        "sortino_ratio": 1.68,
+        "rmse": 0.0121,
+        "max_drawdown": 0.071,
+        "num_folds": 5
+      },
+      "notes": "Validated with Purged 5-Fold CV (+1.6% Hit Rate improvement)"
+    }
+  ],
+  "rollbacks": [
+    {
+      "timestamp": "2026-09-26T12:39:17Z",
+      "restored_version": "v1.0.0-baseline",
+      "demoted_version": "v_1.1.0-champion"
+    }
+  ]
+}

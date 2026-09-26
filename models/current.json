@@ -1,0 +1,15 @@
+{
+  "model_id": "v1.0.0-baseline",
+  "version": "v1.0.0-baseline",
+  "timestamp": "2026-09-26T12:39:17Z",
+  "status": "ACTIVE_RESTORED",
+  "rolled_back_from": "v_1.1.0-champion",
+  "rollback_reason": "Manual operator trigger",
+  "metrics": {
+    "hit_rate": 0.598,
+    "sortino_ratio": 1.68,
+    "rmse": 0.0121,
+    "max_drawdown": 0.071,
+    "num_folds": 5
+  }
+}

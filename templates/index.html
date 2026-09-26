@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surya AI Trading Agent — Live AI Market Terminal</title>
+    
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Chart.js & Marked.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/lib/marked.umd.min.js"></script>
+
+    <style>
+        :root {
+            --bg-base: #07090e;
+            --bg-surface: rgba(15, 23, 42, 0.75);
+            --bg-card: rgba(30, 41, 59, 0.55);
+            --bg-card-hover: rgba(51, 65, 85, 0.7);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(56, 189, 248, 0.25);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+            --accent-cyan: #06b6d4;
+            --accent-blue: #38bdf8;
+            --accent-purple: #c084fc;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-amber: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(192, 132, 252, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.4) 0%, transparent 100%);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            padding-bottom: 60px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 24px 20px;
+        }
+
+        /* ── Header Bar ────────────────────────────────────────────── */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            background: var(--bg-surface);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 24px;
+        }
+
+        .brand-box {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.35);
+        }
+
+        .brand-text h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #38bdf8, #c084fc, #f8fafc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        .brand-text p {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        .pulse-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.2); }
+        }
+
+        .btn-settings {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            padding: 8px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-settings:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-main);
+            border-color: var(--border-glow);
+        }
+
+        /* ── Search & Controls Bar ─────────────────────────────────── */
+        .controls-card {
+            background: var(--bg-surface);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+        }
+
+        .search-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 260px;
+            position: relative;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-dim);
+            font-size: 1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 12px 16px 12px 44px;
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 16px rgba(6, 182, 212, 0.25);
+        }
+
+        .select-lang {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: var(--text-main);
+            font-size: 0.88rem;
+            outline: none;
+            cursor: pointer;
+            min-width: 130px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 22px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(6, 182, 212, 0.45);
+        }
+
+        .btn-purple {
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 22px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-purple:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.45);
+        }
+
+        .quick-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .pill-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            margin-right: 4px;
+        }
+
+        .ticker-pill {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.78rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .ticker-pill:hover {
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(56, 189, 248, 0.35);
+        }
+
+        /* ── Top Stocks Grid ───────────────────────────────────────── */
+        .top-stocks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .stock-card {
+            background: var(--bg-surface);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .stock-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--border-glow);
+            background: var(--bg-card-hover);
+        }
+
+        .stock-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .stock-card-ticker {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .stock-card-name {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
+        }
+
+        .pill-change {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .pill-green {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .pill-red {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .stock-price {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        /* ── Hybrid ML Studio Card ─────────────────────────────────── */
+        .hybrid-studio {
+            background: var(--bg-surface);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(192, 132, 252, 0.25);
+            border-radius: 20px;
+            padding: 26px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hybrid-studio::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #06b6d4, #8b5cf6, #ec4899);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--accent-purple);
+        }
+
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .kpi-card {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 16px;
+            position: relative;
+        }
+
+        .kpi-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .kpi-val {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .kpi-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        /* ── Grid Layout for Charts & Tactical Setup ───────────────── */
+        .ml-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .ml-grid { grid-template-columns: 1fr; }
+        }
+
+        .chart-panel {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .chart-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-container {
+            position: relative;
+            flex: 1;
+            min-height: 280px;
+            width: 100%;
+        }
+
+        .tactical-panel {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .tactical-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+        }
+
+        .tactical-item-label {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .tactical-item-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* ── Model Weight Bar ──────────────────────────────────────── */
+        .weight-bar-box {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+        }
+
+        .weight-bar-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .weight-bar-track {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .weight-bar-fill-tree {
+            height: 100%;
+            background: linear-gradient(90deg, #f59e0b, #eab308);
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .weight-bar-fill-nn {
+            height: 100%;
+            background: linear-gradient(90deg, #8b5cf6, #c084fc);
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ── Bottom Grid: Indicators & Feature Importances ─────────── */
+        .sub-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .sub-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ── Loading Overlay ───────────────────────────────────────── */
+        .loading-box {
+            display: none;
+            background: var(--bg-surface);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border: 4px solid rgba(6, 182, 212, 0.2);
+            border-top-color: var(--accent-cyan);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ── AI Report Studio ──────────────────────────────────────── */
+        .studio-card {
+            display: none;
+            background: var(--bg-surface);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .studio-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
+
+        .tab-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tab-btn {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 8px 16px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-main);
+        }
+
+        .tab-btn.active {
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+
+        .report-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-action {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-main);
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-action:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-glow);
+        }
+
+        .report-content {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            padding: 10px;
+        }
+
+        .report-content h1, .report-content h2, .report-content h3 {
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            margin: 20px 0 10px;
+        }
+
+        .report-content h1 { font-size: 1.4rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px; }
+        .report-content h2 { font-size: 1.2rem; color: var(--accent-blue); }
+        .report-content h3 { font-size: 1.05rem; color: var(--accent-purple); }
+
+        .report-content ul, .report-content ol {
+            padding-left: 24px;
+            margin-bottom: 12px;
+        }
+
+        .report-content li {
+            margin-bottom: 6px;
+        }
+
+        .report-content strong {
+            color: #f8fafc;
+        }
+
+        /* ── Modal Dialog ──────────────────────────────────────────── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: #0f172a;
+            border: 1px solid var(--border-glow);
+            border-radius: 20px;
+            max-width: 520px;
+            width: 100%;
+            padding: 28px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .modal-close:hover { color: #fff; }
+
+        /* ── Raw Data Terminal ─────────────────────────────────────── */
+        .terminal-box {
+            background: #030712;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: #38bdf8;
+            height: 240px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        /* ── Toast Notification ────────────────────────────────────── */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #0f172a;
+            border: 1px solid var(--accent-cyan);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Header -->
+        <header>
+            <div class="brand-box">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>AURA Quant AI</h1>
+                    <p>Hybrid Machine Learning Framework for Stock Price Prediction Using Technical Indicators</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="status-badge">
+                    <div class="pulse-dot"></div>
+                    <span>LIVE QUANT ENGINE</span>
+                </div>
+                <button class="btn-settings" onclick="openSettingsModal()">
+                    <i class="fa-solid fa-key"></i> API Key Settings
+                </button>
+            </div>
+        </header>
+
+        <!-- Search & Control Studio -->
+        <div class="controls-card">
+            <div class="search-row">
+                <div class="input-group">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="tickerInput" class="search-input" value="RELIANCE" placeholder="Search NSE/BSE or Global symbol (e.g. RELIANCE, TCS, AAPL, NVDA)..." autocomplete="off">
+                </div>
+                <select id="languageSelect" class="select-lang">
+                    <option value="English" selected>English</option>
+                    <option value="Hindi">हिंदी (Hindi)</option>
+                    <option value="Telugu">తెలుగు (Telugu)</option>
+                    <option value="Tamil">தமிழ் (Tamil)</option>
+                </select>
+                <button class="btn-purple" id="runMlBtn" onclick="runHybridML()">
+                    <i class="fa-solid fa-microchip"></i> Run Hybrid ML Forecast
+                </button>
+                <button class="btn-primary" id="fetchBtn" onclick="fetchLiveStockData()">
+                    <i class="fa-solid fa-chart-line"></i> Load Chart & Data
+                </button>
+                <button class="btn-action" id="analyzeBtn" onclick="runAnalysis()">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> 4-Agent AI Report
+                </button>
+            </div>
+            <div class="quick-pills">
+                <span class="pill-label">Top Indian Leaders:</span>
+                <span class="ticker-pill" onclick="selectTicker('RELIANCE')">RELIANCE</span>
+                <span class="ticker-pill" onclick="selectTicker('TCS')">TCS</span>
+                <span class="ticker-pill" onclick="selectTicker('HDFCBANK')">HDFCBANK</span>
+                <span class="ticker-pill" onclick="selectTicker('INFY')">INFY</span>
+                <span class="ticker-pill" onclick="selectTicker('ICICIBANK')">ICICIBANK</span>
+                <span class="ticker-pill" onclick="selectTicker('TATAMOTORS')">TATAMOTORS</span>
+                <span class="pill-label" style="margin-left:10px;">Global / Tech:</span>
+                <span class="ticker-pill" onclick="selectTicker('AAPL')">AAPL</span>
+                <span class="ticker-pill" onclick="selectTicker('NVDA')">NVDA</span>
+                <span class="ticker-pill" onclick="selectTicker('TSLA')">TSLA</span>
+                <span class="ticker-pill" onclick="selectTicker('BTC-USD')">BTC-USD</span>
+            </div>
+        </div>
+
+        <!-- Top 5 Market Leaders Dynamic Bar -->
+        <div class="top-stocks-grid" id="topStocksGrid">
+            <div class="stock-card"><i class="fa-solid fa-spinner fa-spin"></i> Loading market data...</div>
+        </div>
+
+        <!-- Hybrid ML Prediction Studio -->
+        <div class="hybrid-studio" id="mlStudioCard">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fa-solid fa-atom"></i> Hybrid ML Quantitative Intelligence Studio
+                </div>
+                <div style="font-size:0.75rem; color:var(--text-muted); font-family:'JetBrains Mono', monospace;" id="mlTimestamp">
+                    Updated: Real-Time
+                </div>
+            </div>
+
+            <!-- Top KPIs -->
+            <div class="kpi-row">
+                <div class="kpi-card" style="border-color:rgba(56, 189, 248, 0.4);">
+                    <div class="kpi-label">
+                        <span>Hybrid ML Target</span>
+                        <i class="fa-solid fa-bullseye" style="color:var(--accent-cyan)"></i>
+                    </div>
+                    <div class="kpi-val" id="mlPredPrice" style="color:var(--accent-cyan);">--</div>
+                    <div class="kpi-sub" id="mlPredChange">Calculating...</div>
+                </div>
+
+                <div class="kpi-card" style="border-color:rgba(16, 185, 129, 0.4);">
+                    <div class="kpi-label">
+                        <span>Tactical Action</span>
+                        <i class="fa-solid fa-signal" style="color:var(--accent-green)"></i>
+                    </div>
+                    <div class="kpi-val" id="mlActionBadge" style="color:var(--accent-green);">--</div>
+                    <div class="kpi-sub">Confidence: <strong id="mlConfidence" style="color:#fff;">--</strong></div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-label">
+                        <span>Directional Hit Rate</span>
+                        <i class="fa-solid fa-crosshairs" style="color:var(--accent-amber)"></i>
+                    </div>
+                    <div class="kpi-val" id="mlHitRate">--</div>
+                    <div class="kpi-sub">Out-of-sample accuracy</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-label">
+                        <span>Strategy Alpha</span>
+                        <i class="fa-solid fa-arrow-trend-up" style="color:var(--accent-purple)"></i>
+                    </div>
+                    <div class="kpi-val" id="mlAlpha" style="color:var(--accent-purple);">--</div>
+                    <div class="kpi-sub">vs Buy & Hold Benchmark</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-label">
+                        <span>Sharpe Ratio</span>
+                        <i class="fa-solid fa-scale-balanced" style="color:#38bdf8"></i>
+                    </div>
+                    <div class="kpi-val" id="mlSharpe">--</div>
+                    <div class="kpi-sub">Risk-adjusted return</div>
+                </div>
+            </div>
+
+            <!-- Dynamic Inverse-Variance Model Weight Split -->
+            <div class="weight-bar-box">
+                <div class="weight-bar-header">
+                    <span style="color:#f59e0b;"><i class="fa-solid fa-tree"></i> Gradient Boosted Trees: <strong id="mlTreeWeightVal">50%</strong></span>
+                    <span style="color:#c084fc;"><i class="fa-solid fa-network-wired"></i> PyTorch BiLSTM (Attention): <strong id="mlNnWeightVal">50%</strong></span>
+                </div>
+                <div class="weight-bar-track">
+                    <div class="weight-bar-fill-tree" id="mlTreeWeightBar" style="width: 50%;"></div>
+                    <div class="weight-bar-fill-nn" id="mlNnWeightBar" style="width: 50%;"></div>
+                </div>
+            </div>
+
+            <!-- Charts & Setup Grid -->
+            <div class="ml-grid">
+                <!-- Forecast Chart -->
+                <div class="chart-panel">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <i class="fa-solid fa-chart-spline" style="color:var(--accent-cyan)"></i>
+                            Actual Price vs Hybrid ML Model Predictions
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="hybridMlChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Tactical Trade Setup Levels -->
+                <div class="tactical-panel">
+                    <div style="font-weight:700; font-size:0.95rem; color:#fff; display:flex; align-items:center; gap:8px;">
+                        <i class="fa-solid fa-compass" style="color:var(--accent-green)"></i> Execution Plan
+                    </div>
+                    <div class="tactical-item">
+                        <span class="tactical-item-label">Current Market Price</span>
+                        <span class="tactical-item-val" id="mlCurrentPrice">--</span>
+                    </div>
+                    <div class="tactical-item">
+                        <span class="tactical-item-label">Optimal Entry Range</span>
+                        <span class="tactical-item-val" id="mlEntryPrice" style="color:#38bdf8;">--</span>
+                    </div>
+                    <div class="tactical-item">
+                        <span class="tactical-item-label">Primary Target (T1)</span>
+                        <span class="tactical-item-val" id="mlTarget1" style="color:#34d399;">--</span>
+                    </div>
+                    <div class="tactical-item">
+                        <span class="tactical-item-label">Extended Target (T2)</span>
+                        <span class="tactical-item-val" id="mlTarget2" style="color:#10b981;">--</span>
+                    </div>
+                    <div class="tactical-item">
+                        <span class="tactical-item-label">ATR Trailing Stop-Loss</span>
+                        <span class="tactical-item-val" id="mlStopLoss" style="color:#f87171;">--</span>
+                    </div>
+                    <div class="tactical-item">
+                        <span class="tactical-item-label">Risk : Reward Ratio</span>
+                        <span class="tactical-item-val" id="mlRiskReward" style="color:#fbbf24;">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Row: Quantitative Feature Importance & Technical Indicators -->
+            <div class="sub-grid">
+                <div class="chart-panel">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <i class="fa-solid fa-ranking-star" style="color:var(--accent-amber)"></i>
+                            Top Technical Indicator Feature Importances (%)
+                        </div>
+                    </div>
+                    <div class="chart-container" style="min-height:220px;">
+                        <canvas id="importanceChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-panel">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <i class="fa-solid fa-terminal" style="color:var(--accent-cyan)"></i>
+                            Market Telemetry & Quantitative Data Stream
+                        </div>
+                    </div>
+                    <div class="terminal-box" id="rawDataBox">
+                        Click "Load Chart & Data" or "Run Hybrid ML" to inspect real-time quantitative feed...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Candlestick / Line Chart Card -->
+        <div class="controls-card" style="margin-bottom:24px;">
+            <div class="chart-header">
+                <div class="chart-title">
+                    <i class="fa-solid fa-chart-area" style="color:var(--accent-blue)"></i>
+                    <span id="chartSymbolBadge">RELIANCE</span> Technical Chart & Moving Averages
+                </div>
+            </div>
+            <div class="chart-container" style="min-height:300px;">
+                <canvas id="stockChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Loading Indicator Box -->
+        <div class="loading-box" id="loadingBox">
+            <div class="spinner"></div>
+            <h3 style="color:#38bdf8; font-family:'Outfit',sans-serif; margin-bottom:8px;" id="loadingTitle">Running Analysis...</h3>
+            <p style="color:var(--text-muted); font-size:0.9rem;" id="loadingDesc">Processing quantitative indicators and running deep neural forecasts...</p>
+        </div>
+
+        <!-- AI Analysis Report Studio Card -->
+        <div class="studio-card" id="studioCard">
+            <div class="studio-header">
+                <div class="tab-bar">
+                    <button class="tab-btn active" onclick="switchTab('masterTab', this)">
+                        <i class="fa-solid fa-award"></i> Master Synthesis
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('marketTab', this)">
+                        <i class="fa-solid fa-chart-pie"></i> Market Dashboard
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('fundamentalTab', this)">
+                        <i class="fa-solid fa-magnifying-glass-chart"></i> Fundamental Analysis
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('technicalTab', this)">
+                        <i class="fa-solid fa-sliders"></i> Technical Analysis
+                    </button>
+                </div>
+                <div class="report-actions">
+                    <button class="btn-action" onclick="readReportTTS()" id="ttsBtn">
+                        <i class="fa-solid fa-volume-high"></i> Listen AI Summary
+                    </button>
+                    <button class="btn-action" onclick="copyReportMD()">
+                        <i class="fa-solid fa-copy"></i> Copy
+                    </button>
+                    <button class="btn-action" onclick="downloadReportMD()">
+                        <i class="fa-solid fa-download"></i> Download (.md)
+                    </button>
+                </div>
+            </div>
+
+            <div class="tab-content">
+                <div id="masterTab" class="tab-pane report-content"></div>
+                <div id="marketTab" class="tab-pane report-content" style="display:none;"></div>
+                <div id="fundamentalTab" class="tab-pane report-content" style="display:none;"></div>
+                <div id="technicalTab" class="tab-pane report-content" style="display:none;"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- API Key Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-key" style="color:var(--accent-cyan)"></i> Groq API Key Settings</h3>
+                <button class="modal-close" onclick="closeSettingsModal()">&times;</button>
+            </div>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:16px;">
+                Enter your free Groq API key from <a href="https://console.groq.com" target="_blank" style="color:var(--accent-cyan);">console.groq.com</a> to enable the 4-Agent Llama 3.3 70B AI Research Engine.
+            </p>
+            <input type="password" id="customGroqKey" class="search-input" placeholder="gsk_..." style="margin-bottom:16px; width:100%;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <button class="btn-action" onclick="testApiKey()">
+                    <i class="fa-solid fa-bolt"></i> Test Connection
+                </button>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn-action" onclick="closeSettingsModal()">Cancel</button>
+                    <button class="btn-primary" onclick="saveApiKey()">Save Key</button>
+                </div>
+            </div>
+            <div id="apiTestResult" style="margin-top:12px; font-size:0.8rem;"></div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toastMsg"></div>
+
+    <script>
+        let reportData = { master: '', market: '', fundamental: '', technical: '' };
+        let stockChartInstance = null;
+        let hybridMlChartInstance = null;
+        let importanceChartInstance = null;
+        let isSpeaking = false;
+
+        // On Page Load
+        window.addEventListener('DOMContentLoaded', () => {
+            // Load custom API key if stored
+            const savedKey = localStorage.getItem('groq_api_key');
+            if (savedKey) {
+                document.getElementById('customGroqKey').value = savedKey;
+            }
+
+            // Bind Enter key on ticker input
+            document.getElementById('tickerInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    fetchLiveStockData();
+                    runHybridML();
+                }
+            });
+
+            fetchTopStocks();
+            fetchLiveStockData();
+            runHybridML();
+        });
+
+        function showToast(msg) {
+            const toast = document.getElementById('toastMsg');
+            toast.innerText = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        function selectTicker(ticker) {
+            document.getElementById('tickerInput').value = ticker;
+            fetchLiveStockData();
+            runHybridML();
+        }
+
+        function openSettingsModal() {
+            document.getElementById('settingsModal').style.display = 'flex';
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById('customGroqKey').value.trim();
+            if (key) {
+                localStorage.setItem('groq_api_key', key);
+                showToast('API Key saved successfully!');
+            } else {
+                localStorage.removeItem('groq_api_key');
+                showToast('API Key removed.');
+            }
+            closeSettingsModal();
+        }
+
+        async function testApiKey() {
+            const key = document.getElementById('customGroqKey').value.trim();
+            const resBox = document.getElementById('apiTestResult');
+            resBox.innerHTML = '<span style="color:var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Testing connection...</span>';
+            try {
+                const res = await fetch('/api/ai-status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ api_key: key })
+                });
+                const data = await res.json();
+                if (data.online) {
+                    resBox.innerHTML = `<span style="color:#34d399;"><i class="fa-solid fa-check"></i> Connected! Model: Llama 3.3 70B Online (${data.active_key_preview})</span>`;
+                } else {
+                    resBox.innerHTML = `<span style="color:#f87171;"><i class="fa-solid fa-circle-xmark"></i> ${data.message}</span>`;
+                }
+            } catch (e) {
+                resBox.innerHTML = `<span style="color:#f87171;">Connection failed: ${e.message}</span>`;
+            }
+        }
+
+        // ── 1. Run Hybrid Machine Learning Stock Prediction Engine ─────────────
+        async function runHybridML() {
+            const ticker = document.getElementById('tickerInput').value.trim() || 'RELIANCE';
+            const loadingBox = document.getElementById('loadingBox');
+            const mlStudio = document.getElementById('mlStudioCard');
+
+            document.getElementById('loadingTitle').innerText = `Running Hybrid ML Framework on ${ticker.toUpperCase()}...`;
+            document.getElementById('loadingDesc').innerText = 'Analyzing 25+ Technical Indicators, training Gradient Boosted Trees and PyTorch BiLSTM Neural Network...';
+            loadingBox.style.display = 'block';
+
+            try {
+                const res = await fetch(`/api/ml-predict?ticker=${encodeURIComponent(ticker)}`);
+                const data = await res.json();
+                loadingBox.style.display = 'none';
+
+                if (data.status === 'success') {
+                    renderHybridMlStudio(data);
+                    mlStudio.style.display = 'block';
+                } else {
+                    showToast(`ML Prediction note: ${data.message || 'Error running model'}`);
+                }
+            } catch (err) {
+                loadingBox.style.display = 'none';
+                console.error("Hybrid ML fetch error:", err);
+            }
+        }
+
+        // Render Hybrid ML Studio UI and Visualizations
+        function renderHybridMlStudio(data) {
+            const setup = data.trade_setup;
+            const meta = data.meta;
+            const evalM = data.evaluation_metrics;
+            const backtest = data.backtest_metrics;
+            const comp = data.model_composition;
+            const currSym = meta.currency_symbol || '₹';
+
+            // Top KPIs
+            document.getElementById('mlPredPrice').innerText = `${currSym}${setup.predicted_price.toLocaleString('en-IN', {minimumFractionDigits:2})}`;
+            const changeEl = document.getElementById('mlPredChange');
+            const isPos = setup.predicted_change_pct >= 0;
+            changeEl.innerText = `${isPos ? '+' : ''}${setup.predicted_change_pct}% Expected Tomorrow`;
+            changeEl.style.color = isPos ? '#34d399' : '#f87171';
+
+            const actionEl = document.getElementById('mlActionBadge');
+            actionEl.innerText = setup.action;
+            actionEl.style.color = setup.action_tone === 'bullish' ? '#34d399' : (setup.action_tone === 'bearish' ? '#f87171' : '#f59e0b');
+            document.getElementById('mlConfidence').innerText = `${setup.confidence_pct}%`;
+
+            document.getElementById('mlHitRate').innerText = `${evalM.hit_rate_pct}%`;
+            document.getElementById('mlAlpha').innerText = `${backtest.outperformance_pct >= 0 ? '+' : ''}${backtest.outperformance_pct}%`;
+            document.getElementById('mlSharpe').innerText = `${backtest.sharpe_ratio}`;
+            document.getElementById('mlTimestamp').innerText = `Computed: ${data.computed_at}`;
+
+            // Tactical Side Panel
+            document.getElementById('mlCurrentPrice').innerText = `${currSym}${setup.current_price.toLocaleString('en-IN', {minimumFractionDigits:2})}`;
+            document.getElementById('mlEntryPrice').innerText = `${currSym}${setup.entry_price.toLocaleString('en-IN', {minimumFractionDigits:2})}`;
+            document.getElementById('mlTarget1').innerText = `${currSym}${setup.target_1.toLocaleString('en-IN', {minimumFractionDigits:2})}`;
+            document.getElementById('mlTarget2').innerText = `${currSym}${setup.target_2.toLocaleString('en-IN', {minimumFractionDigits:2})}`;
+            document.getElementById('mlStopLoss').innerText = `${currSym}${setup.stop_loss.toLocaleString('en-IN', {minimumFractionDigits:2})}`;
+            document.getElementById('mlRiskReward').innerText = setup.risk_reward_ratio;
+
+            // Ensemble Weights
+            document.getElementById('mlTreeWeightVal').innerText = `${comp.tree_weight_pct}% (Pred: ${comp.tree_predicted_ret_pct > 0 ? '+' : ''}${comp.tree_predicted_ret_pct}%)`;
+            document.getElementById('mlTreeWeightBar').style.width = `${comp.tree_weight_pct}%`;
+            document.getElementById('mlNnWeightVal').innerText = `${comp.neural_weight_pct}% (Pred: ${comp.neural_predicted_ret_pct > 0 ? '+' : ''}${comp.neural_predicted_ret_pct}%)`;
+            document.getElementById('mlNnWeightBar').style.width = `${comp.neural_weight_pct}%`;
+
+            // Render Charts
+            renderHybridChart(data.chart_data, meta.ticker, currSym);
+            renderImportanceChart(data.feature_importances);
+        }
+
+        // Render Hybrid Price Actual vs Predicted Chart
+        function renderHybridChart(chartData, ticker, currSym) {
+            const ctx = document.getElementById('hybridMlChart').getContext('2d');
+            if (hybridMlChartInstance) hybridMlChartInstance.destroy();
+
+            hybridMlChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.dates,
+                    datasets: [
+                        {
+                            label: `Actual Market Close (${currSym})`,
+                            data: chartData.actual_prices,
+                            borderColor: '#06b6d4',
+                            backgroundColor: 'rgba(6, 182, 212, 0.12)',
+                            borderWidth: 2.2,
+                            fill: true,
+                            tension: 0.15,
+                            pointRadius: 1,
+                            pointHoverRadius: 6,
+                        },
+                        {
+                            label: `Hybrid ML Forecast (${currSym})`,
+                            data: chartData.predicted_prices,
+                            borderColor: '#c084fc',
+                            borderWidth: 2.2,
+                            borderDash: [3, 3],
+                            fill: false,
+                            tension: 0.15,
+                            pointRadius: (ctx) => (ctx.dataIndex === chartData.dates.length - 1 ? 8 : 0),
+                            pointBackgroundColor: '#f59e0b',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { labels: { color: '#94a3b8', font: { family: 'Inter', size: 11 } } },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            titleColor: '#38bdf8',
+                            bodyColor: '#f8fafc',
+                            borderColor: '#334155',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: (item) => `${item.dataset.label}: ${currSym}${Number(item.raw).toLocaleString('en-IN', {minimumFractionDigits:2})}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { color: 'rgba(255, 255, 255, 0.04)' }, ticks: { color: '#64748b', maxTicksLimit: 10 } },
+                        y: { grid: { color: 'rgba(255, 255, 255, 0.04)' }, ticks: { color: '#64748b' } }
+                    }
+                }
+            });
+        }
+
+        // Render Feature Importance Horizontal Bar Chart
+        function renderImportanceChart(importances) {
+            const ctx = document.getElementById('importanceChart').getContext('2d');
+            if (importanceChartInstance) importanceChartInstance.destroy();
+
+            const labels = Object.keys(importances);
+            const values = Object.values(importances);
+
+            importanceChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Feature Importance (%)',
+                        data: values,
+                        backgroundColor: 'rgba(245, 158, 11, 0.75)',
+                        borderColor: '#f59e0b',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { backgroundColor: '#0f172a', titleColor: '#f59e0b', bodyColor: '#f8fafc' }
+                    },
+                    scales: {
+                        x: { grid: { color: 'rgba(255, 255, 255, 0.04)' }, ticks: { color: '#64748b' }, max: Math.max(...values, 20) + 5 },
+                        y: { grid: { display: false }, ticks: { color: '#94a3b8', font: { family: 'Inter', size: 11, weight: 'bold' } } }
+                    }
+                }
+            });
+        }
+
+        // ── 2. Fetch Top 5 Market Leaders ──────────────────────────────────────
+        async function fetchTopStocks() {
+            const grid = document.getElementById('topStocksGrid');
+            try {
+                const res = await fetch('/api/top-stocks');
+                const resp = await res.json();
+
+                if (resp.status === 'success' && resp.stocks) {
+                    grid.innerHTML = '';
+                    resp.stocks.forEach(stock => {
+                        const isPos = stock.change >= 0;
+                        const changePill = isPos 
+                            ? `<span class="pill-change pill-green"><i class="fa-solid fa-caret-up"></i> +${stock.change_pct}%</span>`
+                            : `<span class="pill-change pill-red"><i class="fa-solid fa-caret-down"></i> ${stock.change_pct}%</span>`;
+
+                        const card = document.createElement('div');
+                        card.className = 'stock-card';
+                        card.onclick = () => selectTicker(stock.ticker);
+                        card.innerHTML = `
+                            <div class="stock-card-top">
+                                <div>
+                                    <div class="stock-card-ticker">${stock.ticker}</div>
+                                    <div class="stock-card-name">${stock.name.substring(0, 18)}</div>
+                                </div>
+                                ${changePill}
+                            </div>
+                            <div class="stock-price">₹${stock.price.toLocaleString('en-IN')}</div>
+                            <div style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">
+                                Range: ₹${stock.day_low} - ₹${stock.day_high}
+                            </div>
+                        `;
+                        grid.appendChild(card);
+                    });
+                }
+            } catch (err) {
+                grid.innerHTML = `<div style="color:var(--text-muted); font-size:0.85rem;">Top 5 tickers temporarily unavailable</div>`;
+            }
+        }
+
+        // ── 3. Fetch Live Stock Data & Render Interactive Graph System ─────────
+        async function fetchLiveStockData() {
+            const ticker = document.getElementById('tickerInput').value.trim() || 'RELIANCE';
+            const rawBox = document.getElementById('rawDataBox');
+            document.getElementById('chartSymbolBadge').innerText = ticker.toUpperCase();
+
+            rawBox.innerHTML = `Fetching live data for ${ticker} from NSE / BSE India...
+Please wait...`;
+
+            try {
+                const res = await fetch(`/api/stock-data?ticker=${encodeURIComponent(ticker)}`);
+                const resp = await res.json();
+
+                if (resp.status === 'success' && resp.data) {
+                    rawBox.innerHTML = resp.data.raw_output || JSON.stringify(resp.data, null, 2);
+
+                    // Render Interactive Chart
+                    if (resp.data.chart_series && resp.data.chart_series.prices) {
+                        renderChart(resp.data.chart_series, ticker);
+                    }
+                } else {
+                    rawBox.innerHTML = `Error: ${resp.message || 'No data received for ' + ticker}`;
+                }
+            } catch (err) {
+                rawBox.innerHTML = `Error fetching live stock data: ${err.message}`;
+            }
+        }
+
+        // Render Chart.js Chart
+        function renderChart(series, ticker) {
+            const ctx = document.getElementById('stockChart').getContext('2d');
+
+            if (stockChartInstance) {
+                stockChartInstance.destroy();
+            }
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(6, 182, 212, 0.35)');
+            gradient.addColorStop(1, 'rgba(6, 182, 212, 0.0)');
+
+            stockChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: series.dates || [],
+                    datasets: [
+                        {
+                            label: `${ticker.toUpperCase()} Close Price (₹)`,
+                            data: series.prices || [],
+                            borderColor: '#06b6d4',
+                            borderWidth: 2.5,
+                            backgroundColor: gradient,
+                            fill: true,
+                            tension: 0.2,
+                            pointRadius: 0,
+                            pointHoverRadius: 6,
+                        },
+                        {
+                            label: 'EMA 20-Day Overlay (₹)',
+                            data: series.ema20 || [],
+                            borderColor: '#8b5cf6',
+                            borderWidth: 1.8,
+                            borderDash: [4, 4],
+                            fill: false,
+                            tension: 0.2,
+                            pointRadius: 0,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { labels: { color: '#94a3b8', font: { family: 'Inter', size: 11 } } },
+                        tooltip: { backgroundColor: '#0f172a', titleColor: '#38bdf8', bodyColor: '#f8fafc', borderColor: '#334155', borderWidth: 1 }
+                    },
+                    scales: {
+                        x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#64748b', maxTicksLimit: 8 } },
+                        y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#64748b' } }
+                    }
+                }
+            });
+        }
+
+        // ── 4. Run Parallel AI Analysis ─────────────────────────────────────────
+        async function runAnalysis() {
+            const ticker = document.getElementById('tickerInput').value.trim() || 'RELIANCE';
+            const language = document.getElementById('languageSelect').value;
+            const customKey = localStorage.getItem('groq_api_key') || '';
+            const loadingBox = document.getElementById('loadingBox');
+            const studioCard = document.getElementById('studioCard');
+
+            document.getElementById('loadingTitle').innerText = `Generating 4-Agent Research Report on ${ticker.toUpperCase()}...`;
+            document.getElementById('loadingDesc').innerText = 'Groq Llama 3.3 70B is analyzing Dashboard, Fundamentals, and Technicals simultaneously...';
+            loadingBox.style.display = 'block';
+            studioCard.style.display = 'none';
+
+            try {
+                const res = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ticker: ticker, language: language, api_key: customKey })
+                });
+                const data = await res.json();
+
+                loadingBox.style.display = 'none';
+                if (data.status === 'success') {
+                    reportData.master = data.master_report || '';
+                    reportData.market = data.dashboard_report || '';
+                    reportData.fundamental = data.fundamental_report || '';
+                    reportData.technical = data.technical_report || '';
+
+                    document.getElementById('masterTab').innerHTML = marked.parse(reportData.master);
+                    document.getElementById('marketTab').innerHTML = marked.parse(reportData.market);
+                    document.getElementById('fundamentalTab').innerHTML = marked.parse(reportData.fundamental);
+                    document.getElementById('technicalTab').innerHTML = marked.parse(reportData.technical);
+
+                    studioCard.style.display = 'block';
+                    studioCard.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    if (data.message && data.message.includes('API key')) {
+                        openSettingsModal();
+                    } else {
+                        alert(`Error running AI analysis: ${data.message}`);
+                    }
+                }
+            } catch (err) {
+                loadingBox.style.display = 'none';
+                alert(`Network error: ${err.message}`);
+            }
+        }
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-pane').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+            document.getElementById(tabId).style.display = 'block';
+            btn.classList.add('active');
+        }
+
+        function copyReportMD() {
+            if (!reportData.master) {
+                showToast('No report to copy yet.');
+                return;
+            }
+            navigator.clipboard.writeText(reportData.master).then(() => {
+                showToast('Master Report copied to clipboard!');
+            }).catch(err => {
+                showToast('Failed to copy: ' + err);
+            });
+        }
+
+        function readReportTTS() {
+            if (!('speechSynthesis' in window)) {
+                showToast('Text-to-speech not supported in this browser.');
+                return;
+            }
+
+            if (isSpeaking) {
+                window.speechSynthesis.cancel();
+                isSpeaking = false;
+                document.getElementById('ttsBtn').innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen AI Summary';
+                return;
+            }
+
+            const activeTab = document.querySelector('.tab-pane:not([style*="display: none"])');
+            if (!activeTab || !activeTab.innerText.trim()) {
+                showToast('No report text to read.');
+                return;
+            }
+
+            const text = activeTab.innerText.substring(0, 1000); // Read first 1000 chars
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 1.0;
+            utterance.pitch = 1.0;
+
+            utterance.onend = () => {
+                isSpeaking = false;
+                document.getElementById('ttsBtn').innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen AI Summary';
+            };
+
+            window.speechSynthesis.speak(utterance);
+            isSpeaking = true;
+            document.getElementById('ttsBtn').innerHTML = '<i class="fa-solid fa-pause"></i> Pause Audio';
+        }
+
+        function downloadReportMD() {
+            if (!reportData.master) {
+                showToast('No report available to download yet.');
+                return;
+            }
+            const ticker = document.getElementById('tickerInput').value.trim() || 'RELIANCE';
+            const blob = new Blob([reportData.master], { type: 'text/markdown;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute('download', `${ticker}_AURA_Quant_Trading_Report.md`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('Download started!');
+        }
+    </script>
+</body>
+</html>\n
