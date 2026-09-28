@@ -128,7 +128,9 @@ def safe(val, default=0):
 
 def _resolve_company_name_to_symbol(query: str) -> str:
     """Intelligently converts company names (e.g. 'tata', 'zomato', 'apple', 'infosys', 'palantir') to real trading symbols."""
-    clean = query.strip().lower()
+    clean = query.strip().lstrip("$").strip().lower()
+    if not clean or clean == "symbol":
+        return "RELIANCE.NS"
     if clean in COMPANY_NAME_MAP:
         return COMPANY_NAME_MAP[clean]
 

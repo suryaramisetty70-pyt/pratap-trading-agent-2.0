@@ -68,9 +68,16 @@ def serve_favicon():
 
 
 
+def normalize_ticker(raw: str, default: str = 'RELIANCE') -> str:
+    if not raw:
+        return default
+    clean = str(raw).strip().lstrip('$').strip().upper()
+    return clean if clean and clean != 'SYMBOL' else default
+
+
 @app.route('/api/stock-data', methods=['GET'])
 def get_stock_data_route():
-    ticker = request.args.get('ticker', 'RELIANCE').strip().upper()
+    ticker = normalize_ticker(request.args.get('ticker', 'RELIANCE'))
     try:
         from stock_data import get_stock_data
         data = get_stock_data(ticker)
@@ -127,7 +134,7 @@ def get_news_route():
 @app.route('/api/analyze', methods=['POST'])
 def analyze_stock():
     payload = request.json or {}
-    ticker = payload.get('ticker', 'RELIANCE').strip().upper()
+    ticker = normalize_ticker(payload.get('ticker', 'RELIANCE'))
     language = payload.get('language', 'English').strip()
     model = payload.get('model', 'llama-3.3-70b-versatile').strip()
     custom_key = payload.get('api_key', '').strip()
@@ -220,8 +227,8 @@ def get_galaxy_nodes_route():
 @app.route('/api/ml-predict', methods=['GET', 'POST'])
 def ml_predict_route():
     payload = request.json or {} if request.is_json else {}
-    ticker = request.args.get('ticker') or payload.get('ticker', 'RELIANCE')
-    ticker = ticker.strip().upper()
+    raw_sym = request.args.get('ticker') or payload.get('ticker', 'RELIANCE')
+    ticker = normalize_ticker(raw_sym)
     period = request.args.get('period') or payload.get('period', '2y')
     force_retrain = bool(payload.get('force_retrain', False) or request.args.get('force', False))
 
@@ -238,7 +245,7 @@ def ml_predict_route():
 @app.route('/api/copilot/explain', methods=['POST'])
 def copilot_explain_route():
     payload = request.json or {}
-    ticker = (payload.get('ticker') or 'RELIANCE').strip().upper()
+    ticker = normalize_ticker(payload.get('ticker') or 'RELIANCE')
     section = payload.get('section', 'technicals')
     mode = payload.get('mode', 'simple')
     language = payload.get('language', 'English')
@@ -256,7 +263,7 @@ def copilot_explain_route():
 @app.route('/api/copilot/why', methods=['POST'])
 def copilot_why_route():
     payload = request.json or {}
-    ticker = (payload.get('ticker') or 'RELIANCE').strip().upper()
+    ticker = normalize_ticker(payload.get('ticker') or 'RELIANCE')
     metric = payload.get('metric', 'rsi')
     mode = payload.get('mode', 'simple')
     language = payload.get('language', 'English')
@@ -274,7 +281,7 @@ def copilot_why_route():
 @app.route('/api/copilot/report', methods=['POST'])
 def copilot_report_route():
     payload = request.json or {}
-    ticker = (payload.get('ticker') or 'RELIANCE').strip().upper()
+    ticker = normalize_ticker(payload.get('ticker') or 'RELIANCE')
     mode = payload.get('mode', 'simple')
     language = payload.get('language', 'English')
     custom_key = payload.get('api_key', '')
@@ -291,7 +298,7 @@ def copilot_report_route():
 @app.route('/api/copilot/chat', methods=['POST'])
 def copilot_chat_route():
     payload = request.json or {}
-    ticker = (payload.get('ticker') or 'RELIANCE').strip().upper()
+    ticker = normalize_ticker(payload.get('ticker') or 'RELIANCE')
     message = payload.get('message', 'What is the outlook for this stock?')
     history = payload.get('history', [])
     mode = payload.get('mode', 'simple')
