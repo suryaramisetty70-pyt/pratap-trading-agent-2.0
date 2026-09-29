@@ -19,13 +19,13 @@ const Globe3D = lazy(() => import("@/components/market/Globe3D"));
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Max Market — AI Market Intelligence Dashboard" },
+      { title: "Spy Agent — AI Market Intelligence Dashboard" },
       {
         name: "description",
         content:
           "Live market dashboard with AI signals, sentiment, heatmaps and a 3D market globe. See the market, understand the signal, make better decisions.",
       },
-      { property: "og:title", content: "Max Market — AI Market Intelligence" },
+      { property: "og:title", content: "Spy Agent — AI Market Intelligence" },
       { property: "og:description", content: "Live indices, AI trade signals, sector heatmaps and a real-time 3D market globe." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -105,7 +105,7 @@ function Home() {
         <section className="relative grid gap-6 overflow-hidden rounded-lg border border-border bg-[radial-gradient(80%_120%_at_50%_0%,color-mix(in_oklab,var(--primary)_10%,transparent),transparent)] p-6 lg:grid-cols-[minmax(300px,1fr)_1.15fr_320px]">
           <div className="relative z-10 flex flex-col justify-center">
             <h1 className="font-display text-5xl leading-[0.95] font-extrabold tracking-tight md:text-6xl">
-              MAX MARKET
+              SPY AGENT
               <span className="grad-text mt-1 block text-4xl md:text-5xl">TRADING AGENT</span>
             </h1>
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-muted-foreground">

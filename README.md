@@ -1,4 +1,4 @@
-# 🚀 Pratap Trading Agent 2.0 — Max Market Institutional Quant & AI Platform
+# 🚀 Spy Agent (Pratap Trading Agent 2.0) — Institutional Quant & AI Platform
 
 [![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue?logo=python)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-Deep%20Learning-EE4C2C?logo=pytorch)](https://pytorch.org/)

@@ -9,13 +9,13 @@ const GalaxyCanvas = lazy(() => import("@/components/market/GalaxyCanvas"));
 export const Route = createFileRoute("/galaxy")({
   head: () => ({
     meta: [
-      { title: "Max Market Galaxy — 3D Sector Constellation Map" },
+      { title: "Spy Agent Galaxy — 3D Sector Constellation Map" },
       {
         name: "description",
         content:
           "Explore the market as a living galaxy: drag to rotate, scroll to zoom and click a star to inspect any stock's live price, volume and sector.",
       },
-      { property: "og:title", content: "Max Market Galaxy — 3D Sector Constellation Map" },
+      { property: "og:title", content: "Spy Agent Galaxy — 3D Sector Constellation Map" },
       { property: "og:description", content: "An interactive 3D star map of market sectors and stocks." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

@@ -1,5 +1,5 @@
 """
-Flask Web App — Max Market: Hybrid Machine Learning & Quant Intelligence Platform
+Flask Web App — Spy Agent: Hybrid Machine Learning & Quant Intelligence Platform
 Uses ONLY Groq API directly. NO CrewAI. NO Google. NO LiteLLM.
 """
 
@@ -412,7 +412,7 @@ def models_rollback_route():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))
     print(f"\n{'='*65}")
-    print(f"  [+] Max Market — Institutional Quant & ML Platform")
+    print(f"  [+] Spy Agent — Institutional Quant & ML Platform")
     print(f"  [ML] Architecture: GBDT + PyTorch BiLSTM (Attention Fusion)")
     print(f"  [AI] LLM Engine  : Groq Llama 3.3 70B (Parallel Research Agents)")
     print(f"  [>] Live Web UI  : http://localhost:{port}")

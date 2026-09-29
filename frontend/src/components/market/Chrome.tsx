@@ -63,11 +63,9 @@ export function TopBar() {
     <header className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur-xl">
       <div className="flex flex-wrap items-center gap-3 px-4 py-2.5">
         <Link to="/" className="flex items-center gap-2.5">
-          <span className="grid size-8 place-items-center rounded-lg bg-gradient-to-br from-cyan-500 to-indigo-600 font-display text-lg font-black text-white shadow-[0_0_15px_rgba(6,182,212,0.4)]">
-            M
-          </span>
-          <span className="font-display text-sm font-extrabold tracking-[0.25em] text-foreground uppercase bg-gradient-to-r from-cyan-400 via-sky-200 to-indigo-300 bg-clip-text text-transparent">
-            MAX MARKET
+          <span className="grid size-8 place-items-center rounded-lg bg-gradient-to-br from-emerald-500 via-cyan-500 to-indigo-600 font-display text-lg font-black text-white shadow-[0_0_15px_rgba(16,185,129,0.4)]">S</span>
+          <span className="font-display text-sm font-extrabold tracking-[0.25em] text-foreground uppercase bg-gradient-to-r from-emerald-400 via-cyan-200 to-indigo-300 bg-clip-text text-transparent">
+            SPY AGENT
           </span>
         </Link>
 

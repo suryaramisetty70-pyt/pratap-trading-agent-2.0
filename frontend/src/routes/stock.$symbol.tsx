@@ -15,10 +15,10 @@ export const Route = createFileRoute("/stock/$symbol")({
     return { quote: q };
   },
   head: ({ loaderData }) => {
-    if (!loaderData) return { meta: [{ title: "Symbol unavailable — Max Market" }, { name: "robots", content: "noindex" }] };
+    if (!loaderData) return { meta: [{ title: "Symbol unavailable — Spy Agent" }, { name: "robots", content: "noindex" }] };
     const q = loaderData.quote;
-    const title = `${q.symbol} — ${q.name} Live Chart, Technicals & Max Market Copilot`;
-    const description = `${q.name} (${q.exchange}) live price, candlestick chart with EMA, technical score, Max Market Copilot explainability, fundamentals and DCF valuation.`;
+    const title = `${q.symbol} — ${q.name} Live Chart, Technicals & Spy Agent Copilot`;
+    const description = `${q.name} (${q.exchange}) live price, candlestick chart with EMA, technical score, Spy Agent Copilot explainability, fundamentals and DCF valuation.`;
     return {
       meta: [
         { title },
@@ -34,7 +34,7 @@ export const Route = createFileRoute("/stock/$symbol")({
 });
 
 const RANGES = ["1D", "5D", "1M", "3M", "6M", "1Y", "5Y", "MAX"] as const;
-const SIDE = ["Overview", "Max Market Copilot", "Hybrid ML", "Charts", "Fundamentals", "Valuation", "News", "Screener", "Watchlist", "Portfolio", "Alerts", "Notes", "Settings"];
+const SIDE = ["Overview", "Spy Agent Copilot", "Hybrid ML", "Charts", "Fundamentals", "Valuation", "News", "Screener", "Watchlist", "Portfolio", "Alerts", "Notes", "Settings"];
 const PERF_COLS = ["1D", "5D", "1M", "3M", "6M", "YTD", "1Y", "3Y", "5Y"];
 
 function StockPage() {
@@ -106,7 +106,7 @@ function StockPage() {
         ))}
         <div className="ml-auto flex items-center gap-3">
           <button
-            onClick={() => setTab("Max Market Copilot")}
+            onClick={() => setTab("Spy Agent Copilot")}
             className="flex items-center gap-1.5 rounded-md border border-primary/50 bg-primary/10 px-3 py-1.5 text-[0.65rem] font-bold tracking-widest text-primary uppercase hover:bg-primary/20 transition shadow-[var(--glow-cyan)]"
           >
             <Sparkles className="size-3.5" /> ASK AI COPILOT
@@ -129,7 +129,7 @@ function StockPage() {
               }`}
             >
               <span>{s}</span>
-              {s === "Max Market Copilot" && <Sparkles className="size-3 text-primary animate-pulse" />}
+              {s === "Spy Agent Copilot" && <Sparkles className="size-3 text-primary animate-pulse" />}
             </button>
           ))}
           <div className="panel mt-3 p-3">
@@ -242,7 +242,7 @@ function StockPage() {
                   title="Financial Performance Matrix"
                   action={
                     <button
-                      onClick={() => setTab("Max Market Copilot")}
+                      onClick={() => setTab("Spy Agent Copilot")}
                       className="text-[0.62rem] font-bold text-primary hover:underline uppercase flex items-center gap-1"
                     >
                       <Sparkles className="size-3" /> Explain with AI →
@@ -292,13 +292,13 @@ function StockPage() {
                   suggestedWhyMetrics={["rsi", "ema_20", "pe_ratio"]}
                 />
 
-                {/* Embedded Max Market Copilot Master Explainer */}
+                {/* Embedded Spy Agent Copilot Master Explainer */}
                 <AiCopilot symbol={quote.symbol} stockData={liveData} />
               </div>
             )}
 
-            {/* TAB: Dedicated Max Market Copilot */}
-            {tab === "Max Market Copilot" && (
+            {/* TAB: Dedicated Spy Agent Copilot */}
+            {tab === "Spy Agent Copilot" && (
               <AiCopilot symbol={quote.symbol} stockData={liveData} initialTab="report" />
             )}
 
@@ -322,7 +322,7 @@ function StockPage() {
                 <Panel
                   title={`Live Financial Statement & Key Ratios — ${quote.symbol}`}
                   action={
-                    <button onClick={() => setTab("Max Market Copilot")} className="text-[0.62rem] font-bold text-primary hover:underline uppercase flex items-center gap-1">
+                    <button onClick={() => setTab("Spy Agent Copilot")} className="text-[0.62rem] font-bold text-primary hover:underline uppercase flex items-center gap-1">
                       <Sparkles className="size-3" /> Explain Fundamentals →
                     </button>
                   }
@@ -377,7 +377,7 @@ function StockPage() {
                 <Panel
                   title={`Intrinsic DCF Valuation & Fair Value Matrix — ${quote.symbol}`}
                   action={
-                    <button onClick={() => setTab("Max Market Copilot")} className="text-[0.62rem] font-bold text-primary hover:underline uppercase flex items-center gap-1">
+                    <button onClick={() => setTab("Spy Agent Copilot")} className="text-[0.62rem] font-bold text-primary hover:underline uppercase flex items-center gap-1">
                       <Sparkles className="size-3" /> Explain DCF Model →
                     </button>
                   }
@@ -422,7 +422,7 @@ function StockPage() {
                 <Panel
                   title={`Live News & Catalyst Feed — ${quote.symbol}`}
                   action={
-                    <button onClick={() => setTab("Max Market Copilot")} className="text-[0.62rem] font-bold text-primary hover:underline uppercase flex items-center gap-1">
+                    <button onClick={() => setTab("Spy Agent Copilot")} className="text-[0.62rem] font-bold text-primary hover:underline uppercase flex items-center gap-1">
                       <Sparkles className="size-3" /> Summarize News with AI →
                     </button>
                   }
@@ -471,7 +471,7 @@ function StockPage() {
               </div>
             )}
 
-            {tab !== "Overview" && tab !== "Max Market Copilot" && tab !== "Charts" && tab !== "Hybrid ML" && tab !== "Fundamentals" && tab !== "Valuation" && tab !== "News" && (
+            {tab !== "Overview" && tab !== "Spy Agent Copilot" && tab !== "Charts" && tab !== "Hybrid ML" && tab !== "Fundamentals" && tab !== "Valuation" && tab !== "News" && (
               <div className="space-y-4">
                 <Panel title={`${tab} Module — ${quote.symbol}`}>
                   <div className="p-4 text-xs text-muted-foreground">
@@ -496,7 +496,7 @@ function StockPage() {
             <Panel
               title="Technical Conviction Score"
               action={
-                <button onClick={() => setTab("Max Market Copilot")} className="text-[0.6rem] font-bold text-primary hover:underline uppercase">
+                <button onClick={() => setTab("Spy Agent Copilot")} className="text-[0.6rem] font-bold text-primary hover:underline uppercase">
                   Explain →
                 </button>
               }
@@ -525,7 +525,7 @@ function StockPage() {
             <Panel
               title="Fundamental Snapshot"
               action={
-                <button onClick={() => setTab("Max Market Copilot")} className="text-[0.6rem] font-bold text-primary hover:underline uppercase">
+                <button onClick={() => setTab("Spy Agent Copilot")} className="text-[0.6rem] font-bold text-primary hover:underline uppercase">
                   Why? →
                 </button>
               }
@@ -550,10 +550,10 @@ function StockPage() {
               </div>
             </Panel>
 
-            <Panel title="Max Market Copilot Quick Actions">
+            <Panel title="Spy Agent Copilot Quick Actions">
               <div className="space-y-2 text-xs">
                 <button
-                  onClick={() => setTab("Max Market Copilot")}
+                  onClick={() => setTab("Spy Agent Copilot")}
                   className="w-full flex items-center justify-between p-2.5 rounded bg-primary/10 border border-primary/40 text-primary font-bold hover:bg-primary/20 transition"
                 >
                   <span className="flex items-center gap-2">
@@ -562,7 +562,7 @@ function StockPage() {
                   <ArrowRight className="size-3.5" />
                 </button>
                 <button
-                  onClick={() => setTab("Max Market Copilot")}
+                  onClick={() => setTab("Spy Agent Copilot")}
                   className="w-full flex items-center justify-between p-2.5 rounded bg-secondary/60 border border-border text-foreground font-semibold hover:border-primary transition"
                 >
                   <span className="flex items-center gap-2">

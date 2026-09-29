@@ -55,7 +55,7 @@ import { IndividualAiBlock } from "@/components/copilot/IndividualAiBlock";
 export const Route = createFileRoute("/terminal")({
   head: () => ({
     meta: [
-      { title: "Max Market Terminal — Institutional Quant Suite" },
+      { title: "Spy Agent Terminal — Institutional Quant Suite" },
       {
         name: "description",
         content:

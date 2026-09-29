@@ -77,13 +77,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Max Market — Live AI Market Terminal" },
+      { title: "Spy Agent — Live AI Market Terminal" },
       {
         name: "description",
         content: "Live market terminal with AI signals, 3D market globe, sector heatmaps and deep stock analytics.",
       },
-      { name: "author", content: "Max Market" },
-      { property: "og:title", content: "Max Market" },
+      { name: "author", content: "Spy Agent" },
+      { property: "og:title", content: "Spy Agent" },
       { property: "og:description", content: "Live AI market terminal with 3D market visualisation." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

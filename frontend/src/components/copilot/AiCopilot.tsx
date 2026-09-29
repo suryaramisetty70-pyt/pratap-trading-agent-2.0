@@ -80,8 +80,8 @@ export function AiCopilot({
         role: "copilot",
         text:
           language === "Telugu-English"
-            ? `Namaskaram! Nenu mee Max Market AI Trading Copilot. ${symbol} gurinchi meeku em doubts unna adagandi (e.g., RSI enduku perigindi?, Target ela calculate chesaru?, etc.)!`
-            : `Hello! I am your Max Market AI Trading Copilot for **${symbol}**. Ask me any question about the technical indicators, ML targets, trade setup, or risk levels.`,
+            ? `Namaskaram! Nenu mee Spy Agent AI Trading Copilot. ${symbol} gurinchi meeku em doubts unna adagandi (e.g., RSI enduku perigindi?, Target ela calculate chesaru?, etc.)!`
+            : `Hello! I am your Spy Agent AI Trading Copilot for **${symbol}**. Ask me any question about the technical indicators, ML targets, trade setup, or risk levels.`,
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       },
     ]);
